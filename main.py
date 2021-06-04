@@ -46,23 +46,33 @@ def insert_rows():
         if ext == '.JPG' or ext == '.jpg' or ext == '.jpeg' or ext == '.JPEG':
             working_image = Image.open(filename, "r")
             exif_data = working_image.getexif()
-            for tag_id in exif_data: # REPLACE ELIFS WITH TRY, EXCEPT, ELSE STRUCTURE
+            for tag_id in exif_data:
                 exif_tag_name = TAGS.get(tag_id, tag_id)
                 value = exif_data.get(tag_id)
-                if exif_tag_name == "Model":
-                    model = value
-                elif exif_tag_name == "Make":
-                    make = value
-                elif exif_tag_name == "DateTime":
-                    date_time = value
+
+                try:
+                    if exif_tag_name == "Model":
+                        model = value
+                except NameError as ex:
+                    print('Exception:', ex)
+
+                try:
+                    if exif_tag_name == "Make":
+                        make = value
+                except NameError as ex:
+                    print('Exception:', ex)
+
+                try:
+                    if exif_tag_name == "DateTime":
+                        date_time = value
+                except NameError as ex:
+                    print('Exception:', ex)
 
             if os.path.isfile(f):
                 file_hash = calculate_hash(f)
                 i = i + 1
                 cur.execute("INSERT INTO images VALUES (?, ?, ?, ?, ?, ?)", (i, f, file_hash, model, make, date_time))
                 connection.commit()
-            else:
-                print("not a jpg")
 
     connection.close()
 

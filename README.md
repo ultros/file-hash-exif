@@ -1,2 +1,2 @@
-# file-hasher
+# file-hash-exif
  
