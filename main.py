@@ -61,8 +61,8 @@ def insert_rows():
                 i = i + 1
                 cur.execute("INSERT INTO images VALUES (?, ?, ?, ?, ?, ?)", (i, f, file_hash, model, make, date_time))
                 connection.commit()
-        # else:
-        # print("not a jpg")
+            else:
+                print("not a jpg")
 
     connection.close()
 
