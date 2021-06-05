@@ -5,9 +5,6 @@ import os
 from PIL import Image
 from PIL.ExifTags import TAGS
 
-directory = ""
-file_path = ""
-
 
 def calculate_hash(f):
     buffer_size = 65536
@@ -23,7 +20,7 @@ def calculate_hash(f):
 
 
 def create_db():
-    connection = sqlite3.connect("test16.db")
+    connection = sqlite3.connect(database_name)
     cur = connection.cursor()
     cur.execute("SELECT count(name) FROM sqlite_master WHERE type='table' AND name='images'")
 
@@ -35,8 +32,8 @@ def create_db():
     connection.close()
 
 
-def insert_rows():
-    connection = sqlite3.connect("test16.db")
+def insert_rows(directory):
+    connection = sqlite3.connect(database_name)
     cur = connection.cursor()
     i = 0
     for filename in os.listdir(directory):
@@ -44,7 +41,7 @@ def insert_rows():
 
         name, ext = os.path.splitext(f)
         if ext == '.JPG' or ext == '.jpg' or ext == '.jpeg' or ext == '.JPEG':
-            working_image = Image.open(filename, "r")
+            working_image = Image.open(directory + "/" + filename, "r")
             exif_data = working_image.getexif()
             for tag_id in exif_data:
                 exif_tag_name = TAGS.get(tag_id, tag_id)
@@ -73,14 +70,12 @@ def insert_rows():
                 i = i + 1
                 cur.execute("INSERT INTO images VALUES (?, ?, ?, ?, ?, ?)", (i, f, file_hash, model, make, date_time))
                 connection.commit()
-
     connection.close()
 
 
 def html_report():
-    connection = sqlite3.connect("test16.db")
+    connection = sqlite3.connect(database_name)
     cur = connection.cursor()
-
     cur.execute("SELECT DISTINCT id, path, sha256, make, model, datetime FROM images")
     rows = cur.fetchall()
     print("<html><head></head><body>")
@@ -98,18 +93,17 @@ def html_report():
 
 # if __name__ == '__main__':
 
-if sys.argv[1] == "-d":
+if sys.argv[1] == "--input":
     if sys.argv[2]:
         directory = sys.argv[2]
     else:
-        print("Usage: python main.py -d 'directory'")
+        print("Usage: python main.py --input 'directory' 'database_name'")
 
-# if sys.argv[1] == "-f":
-#   if sys.argv[2]:
-#      file_path = sys.argv[2]
-# else:
-#    print("Usage: python main.py -f 'file'")
+    if sys.argv[3]:
+        database_name = f"databases\{sys.argv[3]}"
+    else:
+        print("Usage: python main.py --input 'full-path-to-images' 'database_name'")
 
 create_db()
-insert_rows()
+insert_rows(directory)
 # html_report()
