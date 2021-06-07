@@ -6,11 +6,12 @@ from PIL import Image
 from PIL.ExifTags import TAGS
 
 
-def calculate_hash(f):
+def calculate_hash(fn):
     buffer_size = 65536
     sha256 = hashlib.sha256()
+    # md5 = hashlib.sha256()
 
-    with open(f, 'rb') as file:
+    with open(fn, 'rb') as file:
         while True:
             data = file.read(buffer_size)
             if not data:
@@ -40,6 +41,7 @@ def insert_rows(directory):
         f = os.path.join(directory, filename)
 
         name, ext = os.path.splitext(f)
+        # magic number check for incorrect file extension
         if ext == '.JPG' or ext == '.jpg' or ext == '.jpeg' or ext == '.JPEG':
             working_image = Image.open(directory + "/" + filename, "r")
             exif_data = working_image.getexif()
