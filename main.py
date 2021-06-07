@@ -19,6 +19,11 @@ def calculate_hash(fn):
             sha256.update(data)
     return sha256.hexdigest()
 
+def create_folder_structure():
+    try:
+        os.mkdir("databases")
+    except FileExistsError:
+        print('Directory already exists.')
 
 def create_db():
     connection = sqlite3.connect(database_name)
@@ -93,19 +98,19 @@ def html_report():
     connection.close()
 
 
-# if __name__ == '__main__':
+if __name__ == '__main__':
+    if sys.argv[1] == "--input":
+        if sys.argv[2]:
+            directory = sys.argv[2]
+        else:
+            print("Usage: python main.py --input 'full-path-to-images' 'parsed-data-database-name.db'")
 
-if sys.argv[1] == "--input":
-    if sys.argv[2]:
-        directory = sys.argv[2]
-    else:
-        print("Usage: python main.py --input 'directory' 'database_name'")
+        if sys.argv[3]:
+            database_name = f"databases\{sys.argv[3]}"
+        else:
+            print("Usage: python main.py --input 'full-path-to-images' 'parsed-data-database-name.db'")
 
-    if sys.argv[3]:
-        database_name = f"databases\{sys.argv[3]}"
-    else:
-        print("Usage: python main.py --input 'full-path-to-images' 'database_name'")
-
-create_db()
-insert_rows(directory)
-# html_report()
+    create_folder_structure()
+    create_db()
+    insert_rows(directory)
+    # html_report()
